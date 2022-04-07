@@ -48,6 +48,11 @@ class KNearestNeighbor(object):
         return self.predict_labels(dists, k=k)
 
     def compute_distances_two_loops(self, X):
+        # 求 欧拉距离的双重循环函数
+        """
+        :param X:  为测试集，以当前的代码（适配knn实现时）而言 500 * 3072
+        :return:
+        """
         """
         Compute the distance between each test point in X and each training point
         in self.X_train using a nested loop over both the training data and the
@@ -74,7 +79,10 @@ class KNearestNeighbor(object):
 
                 # dists[i][j] = np.sqrt(np.dot(X[i], self.X_train[j])) it is Euclid dis, not dot
                 dists[i][j] = np.sqrt(np.sum(np.square(X[i] - self.X_train[j])))
-
+                """
+                训练集中第j行减去 测试集中第i行 ，得到一个1*3072的小矩阵， 然后对每个元素进行平方再求和 然后开方
+                得到 i 与 j的距离
+                """
                 # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
         return dists
 
@@ -97,7 +105,14 @@ class KNearestNeighbor(object):
             # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
             dists[i, :] = np.sqrt(np.sum(np.square(X[i] - self.X_train), axis=1))
-
+            """
+            self.X_train - X[i, :]  训练集矩阵中每行都减去 测试集的第i行 （临时）
+            np.square(self.X_train - X[i, :]) 返回 每个元素都平方后的矩阵
+            np.sum(np.square(self.X_train - X[i, :]), axis=1)  对每行进行求和, 最后得到 一个 1 * 5000 的矩阵
+             ！ axis = 0 沿着 纵轴对矩阵进行操作， axis = 1 沿着 横轴对 矩阵进行操作， 如果不指定 则会对所有元素进行操作
+            np.sqrt(np.sum(np.square(self.X_train - X[i, :]), axis=1)) ： 数组中每个元素都进行开方
+            双循环和单循环所完成的任务是一样的
+            """
             # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
         return dists
 
